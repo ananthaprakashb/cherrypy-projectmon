@@ -14,8 +14,6 @@ class Team:
 	exposed = True
 
 	def GET(self):
-		print "-------------"
-		print "inside GET of team"
 		with sqlite3.connect(DB_STRING) as con:
 			r = con.execute('SELECT distinct lead from project_monitor')
 		res = r.fetchall()
@@ -31,7 +29,7 @@ class Projects:
 		with sqlite3.connect(DB_STRING) as con:
 			con.row_factory = sqlite3.Row
 			if id == None:
-				r = con.execute('SELECT * from project_monitor where active=1')
+				r = con.execute('SELECT * from project_monitor where active=1 order by mile_stone')
 			else:
 				r = con.execute('SELECT * FROM project_monitor WHERE project_id=?', [id])
 		res = r.fetchall()

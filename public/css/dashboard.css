@@ -103,3 +103,11 @@ body {
     display: inline-block;
     border-radius: 50%;
 }
+.focusForm{
+    background: #F5EFDC;
+    padding: 20px;
+    border-radius: 10px;
+}
+.focusForm label{
+    padding-right:10px;
+}

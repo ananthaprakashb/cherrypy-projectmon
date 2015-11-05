@@ -48,57 +48,28 @@
                 </div>
                 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                     <h1 class="page-header">Dashboard</h1>
-                        <form class="form-inline">
-                            <div class="form-group">
-                                <label for="project_name">Project</label><input type="text" id="project_name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="mile_stone">Mile Stone</label><input type="date" id="mile_stone">
-                            </div>
-                            <div class="form-group">
-                                <label for="lead">Lead</label>
-                                <select id="lead">
-                                </select>
-                            </div>
-                            <button id="submit" type="submit" class="hide">Submit</button>
-                        </form>
-                    <!--div class="row placeholders">
-                        <div class="col-xs-6 col-sm-3 placeholder">
-                            <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
-                            <h4>Label</h4>
-                            <span class="text-muted">Something else</span>
+                        <div id="formElement">
+                            <form class="form-inline">
+                                <div class="form-group">
+                                    <label for="project_name">Project</label><input type="text" id="project_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="mile_stone">Mile Stone</label><input type="date" id="mile_stone">
+                                </div>
+                                <div class="form-group">
+                                    <label for="lead">Lead</label>
+                                    <select id="lead">
+                                    </select>
+                                </div>
+                                <button id="submit" type="submit" class="hide">Submit</button>
+                            </form>
                         </div>
-                        <div class="col-xs-6 col-sm-3 placeholder">
-                            <img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
-                            <h4>Label</h4>
-                            <span class="text-muted">Something else</span>
-                        </div>
-                        <div class="col-xs-6 col-sm-3 placeholder">
-                            <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
-                            <h4>Label</h4>
-                            <span class="text-muted">Something else</span>
-                        </div>
-                        <div class="col-xs-6 col-sm-3 placeholder">
-                            <img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
-                            <h4>Label</h4>
-                            <span class="text-muted">Something else</span>
-                        </div>
-                    </div-->
-
                     <h2 class="sub-header">Projects</h2>
                     <div id="current_projects" class="table-responsive">
                     </div>
                 </div>
             </div>
         </div>
-
-
-
-
-
-
-
-
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="static/js/json2Table.js"></script>
         <script src="static/js/app.js"></script>
@@ -106,15 +77,21 @@
         $(document).ready(function(){
             $('#mile_stone').val(new Date().toDateInputValue());
             var projects = {};
-            $.get('http://localhost:8080/team').done(function(data){
-               projects.team = JSON.parse(data).join(',').split(',')
-                $.each(projects.team, function(key, value) {
+            (projects.getTeam = function(){
+                $.get('http://localhost:8080/team').done(function(data){
+                    projects.team = JSON.parse(data).join(',').split(',')
+                    $.each(projects.team, function(key, value) {
+                        $('#lead')
+                                .append($("<option></option>")
+                                        .attr("value",value)
+                                        .text(value));
+                    });
                     $('#lead')
                             .append($("<option></option>")
-                                    .attr("value",value)
-                                    .text(value));
+                                    .attr("value",0)
+                                    .text("Add New Engineer"));
                 });
-            });
+            })();
             projects.listProject = function(){
                     $.get('http://localhost:8080/projects', function(data){
 
@@ -131,6 +108,8 @@
                                     $('#mile_stone').val(res[$(this).attr('data-index')].mile_stone);
                                     $('#lead').val(res[$(this).attr('data-index')].lead);
                                     $('#submit').text('Update');
+                                    $('#submit').removeClass('hide');
+                                    $('#formElement').addClass('focusForm');
 
                                     $('form').off()
                                             .submit(function(e){
@@ -146,8 +125,11 @@
                                                                         projects.listProject();
                                                                         $('#project_name').val('');
                                                                         $('#mile_stone').val('');
-                                                                        $('#lead').val('');
-                                                                        $('#submit').text('Submit');
+                                                                        $('#lead').replaceWith('<select id="lead"></select>');
+                                                                        projects.getTeam();
+                                                                        $('#submit').text('Submit')
+                                                                                .addClass('hide');
+                                                                        $('#formElement').removeClass('focusForm');
                                                                     });
                                                         });
                                             });
@@ -157,15 +139,22 @@
             projects.listProject();
             $('form').submit(function(e){
                 e.preventDefault();
-                $.post('http://localhost:8080/projects', {project_id: projects.size + 1, project_name:$('#project_name').val(), mile_stone: $("#mile_stone").val(), lead: $('#lead').val()}, function(data){
-                        })
+                $.post('http://localhost:8080/projects', {project_id: projects.size + 1, project_name:$('#project_name').val(), mile_stone: $("#mile_stone").val(), lead: $('#lead').val()})
                         .done(function(){
                             projects.listProject();
+                            $('#project_name').val('');
+                            $('#mile_stone').val('');
+                            $('#submit').text('Submit');
+                            $('#lead').replaceWith('<select id="lead"></select>');
+                            projects.getTeam();
                         });
             });
             $('#project_name').change(function(){
                 if($.trim($(this).val()) !== '') $('#submit').removeClass('hide');
-            })
+            });
+            $('#lead').change(function(){
+                if($(this).val()==="0"){$(this).replaceWith('<input id="lead" type="text" required>');}
+            });
         });
 
 	</script>
