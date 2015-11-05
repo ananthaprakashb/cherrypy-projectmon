@@ -1,0 +1,207 @@
+<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+        <!-- Place favicon.ico in the root directory -->
+
+        <link rel="stylesheet" type="text/css" href="static/css/normalize.css">
+        <link href="static/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="static/css/dashboard.css">
+
+        <script src="static/js/vendor/modernizr-2.8.3.min.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Smart Projects</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-3 col-md-2 sidebar">
+                    <ul class="nav nav-sidebar">
+                        <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
+                        <li><a href="#">Reports</a></li>
+                        <li><a href="#">Analytics</a></li>
+                        <li><a href="#">Export</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                    <h1 class="page-header">Dashboard</h1>
+
+                    <!--div class="row placeholders">
+                        <div class="col-xs-6 col-sm-3 placeholder">
+                            <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
+                            <h4>Label</h4>
+                            <span class="text-muted">Something else</span>
+                        </div>
+                        <div class="col-xs-6 col-sm-3 placeholder">
+                            <img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
+                            <h4>Label</h4>
+                            <span class="text-muted">Something else</span>
+                        </div>
+                        <div class="col-xs-6 col-sm-3 placeholder">
+                            <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
+                            <h4>Label</h4>
+                            <span class="text-muted">Something else</span>
+                        </div>
+                        <div class="col-xs-6 col-sm-3 placeholder">
+                            <img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
+                            <h4>Label</h4>
+                            <span class="text-muted">Something else</span>
+                        </div>
+                    </div-->
+
+                    <h2 class="sub-header">Projects</h2>
+                    <div id="current_projects" class="table-responsive">
+                    </div>
+                    <form class="form-inline">
+                        <div class="form-group">
+                            <label for="project_name">Project:</label><input type="text" id="project_name"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="mile_stone">Mile Stone:</label><input type="date" id="mile_stone"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="lead">Lead:</label>
+                            <select id="lead">
+                                <option val="ananth">Ananth</option>
+                                <option val="ethi">Ethi</option>
+                                <option val="balaji">Balaji</option>
+                                <option val="kesav">Kesav</option>
+                                <option val="danya">Danya Sri</option>
+                                <option val="krishna">Sai Krishna</option>
+                                <option val="raghav">Raghav</option>
+                            </select>
+                        </div>
+                        <button id="submit" type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="static/js/json2Table.js"></script>
+        <script src="static/js/app.js"></script>
+	<script>
+        $(document).ready(function(){
+            $('#mile_stone').val(new Date().toDateInputValue());
+            var projects = {};
+            projects.listProject = function(){
+                    $.get('http://localhost:8080/projects', function(data){
+
+                            })
+                            .done(function(data){
+                                var res = JSON.parse(data);
+                                projects.size = res.length;
+                                res.forEach(function(element, index){element.update = '<a data-project-id=' + element.project_id + ' data-index=' + index + ' href="#update">Update</a>'; delete element.project_id; delete element.active})
+                                $('#current_projects').html(ConvertJsonToTable(res));
+                                $('#current_projects a').click(function(e){
+                                    var project_id = $(this).attr('data-project-id');
+                                    e.preventDefault();
+                                    $('#project_name').val(res[$(this).attr('data-index')].project_name);
+                                    $('#mile_stone').val(res[$(this).attr('data-index')].mile_stone);
+                                    $('#lead').val(res[$(this).attr('data-index')].lead);
+                                    $('#submit').text('Update');
+
+                                    $('form').off()
+                                            .submit(function(e){
+                                                e.preventDefault();
+                                                $.ajax({
+                                                            url: 'http://localhost:8080/projects?' + $.param({project_id:project_id}),
+                                                            type: 'DELETE'
+                                                        })
+                                                        .done(function(){
+                                                            $.post('http://localhost:8080/projects', {project_id:project_id , project_name:$('#project_name').val(), mile_stone: $("#mile_stone").val(), lead: $('#lead').val()}, function(data){
+                                                                    })
+                                                                    .done(function() {
+                                                                        projects.listProject();
+                                                                        $('#project_name').val('');
+                                                                        $('#mile_stone').val('');
+                                                                        $('#lead').val('');
+                                                                        $('#submit').text('Submit');
+                                                                    });
+                                                        });
+                                            });
+                                });
+                            });
+            };
+            projects.listProject();
+            $('form').submit(function(e){
+                e.preventDefault();
+                $.post('http://localhost:8080/projects', {project_id: projects.size + 1, project_name:$('#project_name').val(), mile_stone: $("#mile_stone").val(), lead: $('#lead').val()}, function(data){
+                        })
+                        .done(function(){
+                            projects.listProject();
+                        });
+            });
+        });
+
+	</script>
+    </body>
+</html>
