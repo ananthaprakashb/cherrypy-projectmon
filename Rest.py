@@ -10,6 +10,18 @@ class ProjectManage(object):
     def index(self):
         return open('index.html')
 
+class Team:
+	exposed = True
+
+	def GET(self):
+		print "-------------"
+		print "inside GET of team"
+		with sqlite3.connect(DB_STRING) as con:
+			r = con.execute('SELECT distinct lead from project_monitor')
+		res = r.fetchall()
+
+		return json.dumps(res)
+
 class Projects:
 
 	exposed = True
@@ -44,6 +56,14 @@ def setup_database():
 if __name__ == '__main__':
 	cherrypy.tree.mount(
 		Projects(), '/projects',
+		{'/':
+			{ 'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
+			  'tools.response_headers.on': True,
+              'tools.response_headers.headers': [('Content-Type', 'text/plain')] }
+		}
+	)
+	cherrypy.tree.mount(
+		Team(), '/team',
 		{'/':
 			{ 'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
 			  'tools.response_headers.on': True,

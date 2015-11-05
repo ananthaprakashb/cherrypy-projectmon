@@ -22,44 +22,6 @@
         <![endif]-->
 
         <!-- Add your site or application content here -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         <nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -86,7 +48,20 @@
                 </div>
                 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                     <h1 class="page-header">Dashboard</h1>
-
+                        <form class="form-inline">
+                            <div class="form-group">
+                                <label for="project_name">Project</label><input type="text" id="project_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="mile_stone">Mile Stone</label><input type="date" id="mile_stone">
+                            </div>
+                            <div class="form-group">
+                                <label for="lead">Lead</label>
+                                <select id="lead">
+                                </select>
+                            </div>
+                            <button id="submit" type="submit" class="hide">Submit</button>
+                        </form>
                     <!--div class="row placeholders">
                         <div class="col-xs-6 col-sm-3 placeholder">
                             <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
@@ -113,27 +88,6 @@
                     <h2 class="sub-header">Projects</h2>
                     <div id="current_projects" class="table-responsive">
                     </div>
-                    <form class="form-inline">
-                        <div class="form-group">
-                            <label for="project_name">Project:</label><input type="text" id="project_name"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="mile_stone">Mile Stone:</label><input type="date" id="mile_stone"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="lead">Lead:</label>
-                            <select id="lead">
-                                <option val="ananth">Ananth</option>
-                                <option val="ethi">Ethi</option>
-                                <option val="balaji">Balaji</option>
-                                <option val="kesav">Kesav</option>
-                                <option val="danya">Danya Sri</option>
-                                <option val="krishna">Sai Krishna</option>
-                                <option val="raghav">Raghav</option>
-                            </select>
-                        </div>
-                        <button id="submit" type="submit">Submit</button>
-                    </form>
                 </div>
             </div>
         </div>
@@ -152,6 +106,15 @@
         $(document).ready(function(){
             $('#mile_stone').val(new Date().toDateInputValue());
             var projects = {};
+            $.get('http://localhost:8080/team').done(function(data){
+               projects.team = JSON.parse(data).join(',').split(',')
+                $.each(projects.team, function(key, value) {
+                    $('#lead')
+                            .append($("<option></option>")
+                                    .attr("value",value)
+                                    .text(value));
+                });
+            });
             projects.listProject = function(){
                     $.get('http://localhost:8080/projects', function(data){
 
@@ -200,6 +163,9 @@
                             projects.listProject();
                         });
             });
+            $('#project_name').change(function(){
+                if($.trim($(this).val()) !== '') $('#submit').removeClass('hide');
+            })
         });
 
 	</script>
