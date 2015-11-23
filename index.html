@@ -78,7 +78,7 @@
             $('#mile_stone').val(new Date().toDateInputValue());
             var projects = {};
             (projects.getTeam = function(){
-                $.get('http://localhost:8080/team').done(function(data){
+                $.get('/team').done(function(data){
                     projects.team = JSON.parse(data).join(',').split(',')
                     $.each(projects.team, function(key, value) {
                         $('#lead')
@@ -93,11 +93,12 @@
                 });
             })();
             projects.listProject = function(){
-                    $.get('http://localhost:8080/projects', function(data){
+                    $.get('/projects', function(data){
 
                             })
                             .done(function(data){
                                 var res = JSON.parse(data);
+                                console.log(res)
                                 projects.size = res.length;
                                 res.forEach(function(element, index){element.update = '<a data-project-id=' + element.project_id + ' data-index=' + index + ' href="#update">Update</a>'; delete element.project_id; delete element.active})
                                 $('#current_projects').html(ConvertJsonToTable(res));
@@ -115,11 +116,11 @@
                                             .submit(function(e){
                                                 e.preventDefault();
                                                 $.ajax({
-                                                            url: 'http://localhost:8080/projects?' + $.param({project_id:project_id}),
+                                                            url: '/projects?' + $.param({project_id:project_id}),
                                                             type: 'DELETE'
                                                         })
                                                         .done(function(){
-                                                            $.post('http://localhost:8080/projects', {project_id:project_id , project_name:$('#project_name').val(), mile_stone: $("#mile_stone").val(), lead: $('#lead').val()}, function(data){
+                                                            $.post('/projects', {project_id:project_id , project_name:$('#project_name').val(), mile_stone: $("#mile_stone").val(), lead: $('#lead').val()}, function(data){
                                                                     })
                                                                     .done(function() {
                                                                         projects.listProject();
@@ -139,7 +140,7 @@
             projects.listProject();
             $('form').submit(function(e){
                 e.preventDefault();
-                $.post('http://localhost:8080/projects', {project_id: projects.size + 1, project_name:$('#project_name').val(), mile_stone: $("#mile_stone").val(), lead: $('#lead').val()})
+                $.post('/projects', {project_id: projects.size + 1, project_name:$('#project_name').val(), mile_stone: $("#mile_stone").val(), lead: $('#lead').val()})
                         .done(function(){
                             projects.listProject();
                             $('#project_name').val('');
